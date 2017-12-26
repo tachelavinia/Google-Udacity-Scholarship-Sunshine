@@ -19,7 +19,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -45,7 +44,6 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity implements ForecastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<String[]> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String QUERY_LOCATION_EXTRA = "queryLocation";
     private static final int UNIQUE_QUERY_LOADER_ID = 5;
 
     private RecyclerView mRecyclerView;
@@ -105,21 +103,12 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
         /* Once all of our views are setup, we can load the weather data. */
         getSupportLoaderManager().initLoader(UNIQUE_QUERY_LOADER_ID, null, this);
-        loadWeatherData();
     }
 
     /**
      * This method will get the user's preferred location for weather, and then tell some
      * background method to get the weather data in the background.
      */
-    private void loadWeatherData() {
-        showWeatherDataView();
-
-        String location = SunshinePreferences.getPreferredWeatherLocation(this);
-        Bundle bundle = new Bundle();
-        bundle.putString(QUERY_LOCATION_EXTRA, location);
-        getSupportLoaderManager().restartLoader(UNIQUE_QUERY_LOADER_ID, bundle, this);
-    }
 
     /**
      * This method is overridden by our MainActivity class in order to handle RecyclerView item
@@ -186,10 +175,7 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
             @Override
             public String[] loadInBackground() {
 
-                if(args == null || (!args.containsKey(QUERY_LOCATION_EXTRA)))
-                    return null;
-
-                String location = args.getString(QUERY_LOCATION_EXTRA);
+                String location = SunshinePreferences.getPreferredWeatherLocation(getContext());
                 if(location == null || location.isEmpty())
                     return null;
 
@@ -275,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
 
         if (id == R.id.action_refresh) {
             mForecastAdapter.setWeatherData(null);
-            loadWeatherData();
+            getSupportLoaderManager().restartLoader(UNIQUE_QUERY_LOADER_ID, null, this);
             return true;
         }
 
