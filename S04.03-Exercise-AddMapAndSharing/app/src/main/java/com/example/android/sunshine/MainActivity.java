@@ -221,7 +221,15 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
             return true;
         }
 
-        // TODO (2) Launch the map when the map menu item is clicked
+        // COMPLETED TODO (2) Launch the map when the map menu item is clicked
+        if(id == R.id.action_map) {
+            String location = SunshinePreferences.getPreferredWeatherLocation(this);
+            Uri.Builder builder = new Uri.Builder();
+            Uri uri = builder.scheme("geo").path("0,0").appendQueryParameter("q", location).build();
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
